@@ -20,15 +20,9 @@ services:
   notebook:
     container_name: notebook
     volumes:
-      - ~/.oci:/home/datascience/block_storage/.oci
-    image: odsc-dev-docker-local.artifactory.oci.oraclecorp.com/datascience/jupyter-gpu:244
+      - ~/jupyter_work_dir:/home/jovyan/work
+    image: quay.io/jupyter/base-notebook
     ports:
         - 8888:8888
-    environment:
-      - NB_SESSION_COMPARTMENT_OCID=ocid1.compartment.oc1..aaaaaaaapyp4ubdzjt7ggwf2ymdiyq4r25mc6xfbu2zksdo2tebfzj6yz3hq
-      - PROJECT_OCID=ocid1.datascienceproject.oc1.iad.aaaaaaaasnzmqhgij4xdvtljci6achjq5xgy7bfq5im3ew6upz6ttxrkx6wa
-      - OCI_ODSC_SERVICE_ENDPOINT=https://datasciencePreProdProxying.us-ashburn-1.oci.oraclecloud.com
-      - OCI_IDENTITY_SERVICE_ENDPOINT=https://identity.us-ashburn-1.oraclecloud.com
-      - OCI_CONFIG_PROFILE=ADS
-    command: ["jupyter", "lab", "--no-browser", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
+    command: ["start-notebook.py", "--no-browser", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
     restart: on-failure # Avoid flapping for local dev.
