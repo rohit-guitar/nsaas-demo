@@ -7,16 +7,7 @@ services:
     command: --config /oauth2-proxy.cfg
     volumes:
       - "./oauth2-proxy-nginx.cfg:/oauth2-proxy.cfg"
-  nginx:
-    container_name: partner-router
-    image: nginx:1.27.0
-    depends_on:
-      - oauth2-proxy
-      - notebook
-    volumes:
-      - ./nginx.conf:/etc/nginx/templates/default.conf.template
-    ports:
-      - 80:80
+    restart: on-failure
   notebook:
     container_name: notebook
     volumes:
@@ -26,3 +17,25 @@ services:
         - 8888:8888
     command: ["start-notebook.py", "--no-browser", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
     restart: on-failure # Avoid flapping for local dev.
+  partner-cache:
+    container_name: partner-cache
+    image: redis/redis-stack-server:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ~/redisdata:/data
+    restart: on-failure
+  partner-router:
+    container_name: partner-router
+    image: nginx:1.27.0
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+    ports:
+      - 80:80
+    restart: on-failure
+    depends_on:
+      - oauth2-proxy
+      - notebook
+      - partner-cache
+
+    
