@@ -9,6 +9,11 @@ run-nginx:
 		-p 80:80 \
 		nginx:1.27.0
 
+run-jupyterlab:
+	docker run -v ~/jupyter_work_dir:/home/jovyan/work \
+		-p 8888:8888 \
+		quay.io/jupyter/base-notebook start-notebook.py --NotebookApp.token=''
+
 .PHONY: up
 up:
 	docker compose up -d
