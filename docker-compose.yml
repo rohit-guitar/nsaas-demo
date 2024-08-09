@@ -29,7 +29,7 @@ services:
     container_name: partner-router
     image: nginx:1.27.0
     volumes:
-      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+      - ./nginx-conf:/etc/nginx
     ports:
       - 80:80
     restart: on-failure

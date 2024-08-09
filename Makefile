@@ -1,11 +1,11 @@
 run-oauth2: 
-	docker run -v ~/misc/nginx-oauth2-proxy/oauth2-proxy-nginx.cfg:/site_config/oauth2-proxy.cfg \
+	docker run -v ~/misc/nsaas-demo/oauth2-proxy-nginx.cfg:/site_config/oauth2-proxy.cfg \
 		-p 4180:4180 \
 		quay.io/oauth2-proxy/oauth2-proxy:v7.6.0-alpine \
 		--config=/site_config/oauth2-proxy.cfg
 
-run-nginx:
-	docker run -v ~/misc/oauth2-proxy/nginx.conf:/etc/nginx/conf.d/default.conf \
+run-nginx: # #~/misc/nsaas-demo/nginx-conf:/etc/nginx/conf.d/default.conf
+	docker run -v  ~/misc/nsaas-demo/nginx-conf:/etc/nginx \
 		-p 80:80 \
 		nginx:1.27.0
 
