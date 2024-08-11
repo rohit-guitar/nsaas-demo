@@ -1,0 +1,19 @@
+{
+  "name": "node-websocket-proxy",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/rohit-guitar/nsaas-demo.git",
+  "author": "rohit garg <rohit.rg.garg@oracle.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "es6-promise": "^4.2.8",
+    "http": "^0.0.1-security",
+    "http-proxy": "^1.18.1",
+    "isomorphic-fetch": "^3.0.0",
+    "oci-common": "^2.91.0",
+    "redis": "^4.7.0"
+  }
+}

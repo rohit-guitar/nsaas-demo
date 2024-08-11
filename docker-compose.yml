@@ -25,11 +25,19 @@ services:
     volumes:
       - ~/redisdata:/data
     restart: on-failure
+  node-websocket-proxy:
+    container_name: node-websocket-proxy
+    image: node-websocket-proxy:latest
+    volumes:
+      - ~/.oci:/config/.oci
+    ports:
+      - 8891:8891
+    restart: on-failure
   partner-router:
     container_name: partner-router
     image: nginx:1.27.0
     volumes:
-      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+      - ./nginx-conf:/etc/nginx
     ports:
       - 80:80
     restart: on-failure
