@@ -3,14 +3,16 @@ const ociAuth = require("./oci-auth");
 const redisClient = require("./redis");
 
 var proxy = httpProxy.createProxy({
-    ws : true
+    ws: true,
+    secure: false // for the localhost
 });
 
 (async () => {
   await redisClient.initializeRedisFromJson();
 })();
 
-var targetHost = "http://notebook:8888";
+var targetHost = process.env.TARGET_HOST;
+console.log(`Target host set to ${targetHost}`);
 
 async function validateRequestAndGetUserDetails(req, userDetails) {
   if (!req.method) {
