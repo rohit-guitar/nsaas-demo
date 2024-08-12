@@ -11,9 +11,6 @@ var proxy = httpProxy.createProxy({
   await redisClient.initializeRedisFromJson();
 })();
 
-var targetHost = process.env.TARGET_HOST;
-console.log(`Target host set to ${targetHost}`);
-
 async function validateRequestAndGetUserDetails(req, userDetails) {
   if (!req.method) {
     console.error("Request has no method defined");
@@ -63,7 +60,7 @@ var server = require('http').createServer(async function(req, res) {
       req.destroy();
     }
     proxy.web(req, res, {
-      target: targetHost
+      target: userDetailsObject.routerHost
     },function(e){
       log_error(e,req);
     });
@@ -82,7 +79,7 @@ server.on('upgrade',async function(req,res){
       req.destroy();
     }
     proxy.ws(req, res, {
-      target: targetHost
+      target: userDetailsObject.routerHost
     },function(e){
       log_error(e,req);
     });

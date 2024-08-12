@@ -1,6 +1,7 @@
 {
     "rohitgarg.alwar@gmail.com": {
         "profileName": "DEFAULT",
-        "notebookSessionOCID": "ocid1.datasciencenotebooksession.oc1.phx.aaaaaaaarxbdrfby6kbcp4s7wfxzjaildgefltic4mrprffet327tfg3x6mq"
+        "notebookSessionOCID": "ocid1.datasciencenotebooksession.oc1.phx.aaaaaaaarxbdrfby6kbcp4s7wfxzjaildgefltic4mrprffet327tfg3x6mq",
+        "routerHost": "https://dockerhost:8182"
     }
 }
