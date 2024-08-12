@@ -54,7 +54,7 @@ var server = require('http').createServer(async function(req, res) {
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, targetHost, userDetailsObject);
+    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
     if (!await validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       req.destroy();
@@ -72,7 +72,7 @@ server.on('upgrade',async function(req,res){
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, targetHost, userDetailsObject);
+    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
     if (!validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       console.log(JSON.stringify(req.headers));
@@ -91,7 +91,6 @@ server.listen(8891);
 function log_error(e, req){
     if (e){
         console.error(e.message);
-        console.log(req.headers.host,'-->',targetHost);
         console.log('-----');
     }
 }

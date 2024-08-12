@@ -7,7 +7,7 @@ const configurationFilePath = "/config/.oci/config.bak"; // We will mount the oc
 const configProfile = "DEFAULT";
 // const notebookRouterPathForByoc = "/notebook";
 
-async function signRequestWithOciIdentity(req, targetHost, userDetails) {
+async function signRequestWithOciIdentity(req, userDetails) {
   try {
     if (!userDetails.profileName) {
         throw new Error("Sign OCI request failed, profileName is missing");
