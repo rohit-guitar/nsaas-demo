@@ -3,14 +3,13 @@ const ociAuth = require("./oci-auth");
 const redisClient = require("./redis");
 
 var proxy = httpProxy.createProxy({
-    ws : true
+    ws: true,
+    secure: false // for the localhost
 });
 
 (async () => {
   await redisClient.initializeRedisFromJson();
 })();
-
-var targetHost = "http://notebook:8888";
 
 async function validateRequestAndGetUserDetails(req, userDetails) {
   if (!req.method) {
@@ -55,13 +54,13 @@ var server = require('http').createServer(async function(req, res) {
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, targetHost, userDetailsObject);
+    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
     if (!await validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       req.destroy();
     }
     proxy.web(req, res, {
-      target: targetHost
+      target: userDetailsObject.routerHost
     },function(e){
       log_error(e,req);
     });
@@ -73,14 +72,14 @@ server.on('upgrade',async function(req,res){
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, targetHost, userDetailsObject);
+    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
     if (!validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       console.log(JSON.stringify(req.headers));
       req.destroy();
     }
     proxy.ws(req, res, {
-      target: targetHost
+      target: userDetailsObject.routerHost
     },function(e){
       log_error(e,req);
     });
@@ -92,7 +91,6 @@ server.listen(8891);
 function log_error(e, req){
     if (e){
         console.error(e.message);
-        console.log(req.headers.host,'-->',targetHost);
         console.log('-----');
     }
 }

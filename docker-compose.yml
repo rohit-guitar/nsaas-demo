@@ -1,6 +1,13 @@
 version: "3.7"
 
 services:
+  dockerhost: # all the traffic will be redirected to localhost
+    container_name: dockerhost
+    image: qoomon/docker-host:latest
+    cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
+    restart: on-failure
+    networks: 
+      - nsaas-demo
   oauth2-proxy:
     container_name: auth-sidecar
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0-alpine
@@ -8,6 +15,10 @@ services:
     volumes:
       - "./oauth2-proxy-nginx.cfg:/oauth2-proxy.cfg"
     restart: on-failure
+    networks: 
+      - nsaas-demo
+    depends_on:
+      - dockerhost
   notebook:
     container_name: notebook
     volumes:
@@ -15,8 +26,12 @@ services:
     image: quay.io/jupyter/base-notebook
     ports:
         - 8888:8888
-    command: ["start-notebook.py", "--no-browser", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
+    command: ["start-notebook.py", "--no-browser", "--ServerApp.base_url='/notebook'", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
     restart: on-failure # Avoid flapping for local dev.
+    networks: 
+      - nsaas-demo
+    depends_on:
+      - dockerhost
   partner-cache:
     container_name: partner-cache
     image: redis/redis-stack-server:latest
@@ -25,6 +40,10 @@ services:
     volumes:
       - ~/redisdata:/data
     restart: on-failure
+    networks: 
+      - nsaas-demo
+    depends_on:
+      - dockerhost
   node-websocket-proxy:
     container_name: node-websocket-proxy
     image: node-websocket-proxy:latest
@@ -33,6 +52,10 @@ services:
     ports:
       - 8891:8891
     restart: on-failure
+    networks: 
+      - nsaas-demo
+    depends_on:
+      - dockerhost
   partner-router:
     container_name: partner-router
     image: nginx:1.27.0
@@ -41,9 +64,15 @@ services:
     ports:
       - 80:80
     restart: on-failure
+    networks: 
+      - nsaas-demo
     depends_on:
       - oauth2-proxy
       - notebook
       - partner-cache
+      - dockerhost
+networks:
+  nsaas-demo: 
+    driver: bridge
 
     
