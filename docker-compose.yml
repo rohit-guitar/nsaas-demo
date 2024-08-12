@@ -26,7 +26,7 @@ services:
     image: quay.io/jupyter/base-notebook
     ports:
         - 8888:8888
-    command: ["start-notebook.py", "--no-browser", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
+    command: ["start-notebook.py", "--no-browser", "--ServerApp.base_url='/notebook'", "--NotebookApp.token=''", "--Notebook.password=''", "--NotebookApp.disable_check_xsrf=True"]
     restart: on-failure # Avoid flapping for local dev.
     networks: 
       - nsaas-demo

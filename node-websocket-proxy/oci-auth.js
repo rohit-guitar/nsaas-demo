@@ -5,7 +5,7 @@ promise.polyfill();
 
 const configurationFilePath = "/config/.oci/config.bak"; // We will mount the oci config dir
 const configProfile = "DEFAULT";
-const notebookRouterPathForByoc = "/notebook";
+// const notebookRouterPathForByoc = "/notebook";
 
 async function signRequestWithOciIdentity(req, targetHost, userDetails) {
   try {
@@ -16,7 +16,8 @@ async function signRequestWithOciIdentity(req, targetHost, userDetails) {
         throw new Error("Sign OCI request failed, notebookSessionOCID is missing");
     }
 
-    const notebookUrlPath = `/${userDetails.notebookSessionOCID}${notebookRouterPathForByoc}${req.url}`;
+    // const notebookUrlPath = `/${userDetails.notebookSessionOCID}${notebookRouterPathForByoc}${req.url}`;
+    const notebookUrlPath = `/${userDetails.notebookSessionOCID}${req.url}`;
 
     // 0. Create Config Provider
     const provider = new common.ConfigFileAuthenticationDetailsProvider(
