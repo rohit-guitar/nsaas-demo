@@ -54,8 +54,6 @@ services:
     restart: on-failure
     networks: 
       - nsaas-demo
-    environment:
-      TARGET_HOST: "https://dockerhost:8182"
     depends_on:
       - dockerhost
   partner-router:
