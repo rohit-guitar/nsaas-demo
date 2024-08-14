@@ -3,8 +3,6 @@ const promise = require("es6-promise");
 require("isomorphic-fetch");
 promise.polyfill();
 
-const configurationFilePath = "/config/.oci/config.bak"; // We will mount the oci config dir
-const configProfile = "DEFAULT";
 // const notebookRouterPathForByoc = "/notebook";
 
 async function signRequestWithOciIdentity(req, userDetails) {
@@ -18,15 +16,30 @@ async function signRequestWithOciIdentity(req, userDetails) {
     if (!userDetails.routerHost) {
         throw new Error("Sign OCI request failed, routerHost is missing");
     }
+    if (!userDetails.configurationFilePath) {
+        throw new Error("Sign OCI request failed, configurationFilePath is missing");
+    }
+    if (!userDetails.authType) {
+        throw new Error("Sign OCI request failed, authType is missing");
+    }
 
     // const notebookUrlPath = `/${userDetails.notebookSessionOCID}${notebookRouterPathForByoc}${req.url}`;
     const notebookUrlPath = `/${userDetails.notebookSessionOCID}${req.url}`;
 
     // 0. Create Config Provider
-    const provider = new common.ConfigFileAuthenticationDetailsProvider(
-        configurationFilePath,
-        userDetails.profileName || configProfile,
-    );
+    let provider;
+    if (userDetails.authType === "SESSION_TOKEN") {
+        provider = new common.SessionAuthDetailProvider(
+            userDetails.configurationFilePath,
+            userDetails.profileName,
+        )
+
+    } else if (userDetails.authType === "API_KEY") {
+        provider = new common.ConfigFileAuthenticationDetailsProvider(
+            userDetails.configurationFilePath,
+            userDetails.profileName,
+        );
+    }
 
     // 1. Create Request Signing instance
     const signer = new common.DefaultRequestSigner(provider);
