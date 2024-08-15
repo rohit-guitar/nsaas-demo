@@ -49,9 +49,9 @@ async function signRequestWithOciIdentity(req, userDetails) {
 
     // 2. Create HttpRequest to be signed
     const request_headers = new Headers();
-    for (const key in req.headers) {
-        request_headers.set(key, req.headers[key]);
-    }
+    // for (const key in req.headers) {
+    //     request_headers.set(key, req.headers[key]);
+    // }
     const httpRequest = {
         uri: `${userDetails.routerSignatureHost}${notebookUrlPath}`,
         headers: request_headers,
