@@ -49,6 +49,7 @@ function validateAuthHeaderIsPresent(req) {
 }
 
 var server = require('http').createServer(async function(req, res) {
+    log_request_from_oauth2proxy(req);
     let userDetailsObject = {};
     if (!await validateRequestAndGetUserDetails(req, userDetailsObject)) {
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
@@ -57,8 +58,10 @@ var server = require('http').createServer(async function(req, res) {
     await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
     if (!await validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
+      console.log(JSON.stringify(req.headers));
       req.destroy();
     }
+    log_request_to_downstream(req, userDetailsObject.routerHost);
     proxy.web(req, res, {
       target: userDetailsObject.routerHost
     },function(e){
@@ -67,6 +70,7 @@ var server = require('http').createServer(async function(req, res) {
 });
 
 server.on('upgrade',async function(req,res){
+    log_request_from_oauth2proxy(req);
     let userDetailsObject = {};
     if (!await validateRequestAndGetUserDetails(req, userDetailsObject)) {
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
@@ -78,6 +82,7 @@ server.on('upgrade',async function(req,res){
       console.log(JSON.stringify(req.headers));
       req.destroy();
     }
+    log_request_to_downstream(req, userDetailsObject.routerHost);
     proxy.ws(req, res, {
       target: userDetailsObject.routerHost
     },function(e){
@@ -87,7 +92,16 @@ server.on('upgrade',async function(req,res){
 
 console.log("Server is running on 8891");
 server.listen(8891);
-  
+
+function log_request_from_oauth2proxy(req) {
+  console.log(`Request received from oauth2-proxy for url :${req.url}`);
+}
+
+function log_request_to_downstream(req, routerHost) {
+  console.log(`Forwarding request to downstream at: ${routerHost}${req.url} with request headers: ${JSON.stringify(req.headers)}`);
+  console.log('-----');
+}
+
 function log_error(e, req){
     if (e){
         console.error(e.message);
