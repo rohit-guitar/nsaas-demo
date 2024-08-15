@@ -35,8 +35,11 @@ async function signRequestWithOciIdentity(req, userDetails) {
         provider = new common.SessionAuthDetailProvider(
             userDetails.configurationFilePath,
             userDetails.profileName,
-        )
+        );
 
+        if (!provider.getSecurityToken()) {
+            await provider.refreshSessionToken();
+        }
     } else if (userDetails.authType === "API_KEY") {
         provider = new common.ConfigFileAuthenticationDetailsProvider(
             userDetails.configurationFilePath,
