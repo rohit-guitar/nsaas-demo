@@ -22,6 +22,9 @@ async function signRequestWithOciIdentity(req, userDetails) {
     if (!userDetails.authType) {
         throw new Error("Sign OCI request failed, authType is missing");
     }
+    if (!userDetails.routerSignatureHost) {
+        throw new Error("Sign OCI request failed, routerSignatureHost is missing");
+    } 
 
     // const notebookUrlPath = `/${userDetails.notebookSessionOCID}${notebookRouterPathForByoc}${req.url}`;
     const notebookUrlPath = `/${userDetails.notebookSessionOCID}${req.url}`;
@@ -46,11 +49,11 @@ async function signRequestWithOciIdentity(req, userDetails) {
 
     // 2. Create HttpRequest to be signed
     const request_headers = new Headers();
-    for (const key in req.headers) {
-        request_headers.set(key, req.headers[key]);
-    }
+    // for (const key in req.headers) {
+    //     request_headers.set(key, req.headers[key]);
+    // }
     const httpRequest = {
-        uri: `${userDetails.routerHost}${notebookUrlPath}`,
+        uri: `${userDetails.routerSignatureHost}${notebookUrlPath}`,
         headers: request_headers,
         method: req.method
     };
