@@ -48,6 +48,33 @@ function validateAuthHeaderIsPresent(req) {
   return false;
 }
 
+function getBody(request) {
+  return new Promise((resolve) => {
+      const bodyParts = [];
+      let body;
+      request.on('data', (chunk) => {
+          bodyParts.push(chunk);
+      }).on('end', () => {
+          body = Buffer.concat(bodyParts).toString();
+          resolve(body);
+      });
+  });
+}
+
+proxy.on('proxyReq', function(proxyReq, req, res, options) {
+  if (req.body && req.body.length > 0) {
+    console.log("Restreaming body");
+    proxyReq.write(req.body);
+  }
+});
+
+proxy.on('error', function (err, req, res) {
+  res.writeHead(500, {
+    'Content-Type': 'text/plain',
+  });
+  res.end('Something went wrong. And we are reporting a custom error message.' + err);
+});
+
 var server = require('http').createServer(async function(req, res) {
     log_request_from_oauth2proxy(req);
     let userDetailsObject = {};
@@ -55,7 +82,9 @@ var server = require('http').createServer(async function(req, res) {
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
+    // fetch body if any
+    const body = await getBody(req);
+    await ociAuth.signRequestWithOciIdentity(req, body, userDetailsObject);
     if (!await validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       console.log(JSON.stringify(req.headers));
@@ -76,7 +105,7 @@ server.on('upgrade',async function(req,res){
       console.log(`Request validation failed, stop the request: req: ${req.url}`);
       req.destroy();
     }
-    await ociAuth.signRequestWithOciIdentity(req, userDetailsObject);
+    await ociAuth.signRequestWithOciIdentity(req, null, userDetailsObject);
     if (!validateAuthHeaderIsPresent(req)) {
       console.log(`Auth Header is missing: req: ${req.url}`);
       console.log(JSON.stringify(req.headers));
@@ -94,11 +123,11 @@ console.log("Server is running on 8891");
 server.listen(8891);
 
 function log_request_from_oauth2proxy(req) {
-  console.log(`Request received from oauth2-proxy for url :${req.url}`);
+  console.log(`Request received from oauth2-proxy for url :${req.method}:${req.url}`);
 }
 
 function log_request_to_downstream(req, routerHost) {
-  console.log(`Forwarding request to downstream at: ${routerHost}${req.url} with request headers: ${JSON.stringify(req.headers)}`);
+  console.log(`Forwarding request to downstream at: ${routerHost}${req.url}`); // with request headers: ${JSON.stringify(req.headers)}
   console.log('-----');
 }
 

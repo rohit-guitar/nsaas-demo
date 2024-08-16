@@ -5,7 +5,7 @@ promise.polyfill();
 
 // const notebookRouterPathForByoc = "/notebook";
 
-async function signRequestWithOciIdentity(req, userDetails) {
+async function signRequestWithOciIdentity(req, body, userDetails) {
   try {
     if (!userDetails.profileName) {
         throw new Error("Sign OCI request failed, profileName is missing");
@@ -52,13 +52,14 @@ async function signRequestWithOciIdentity(req, userDetails) {
 
     // 2. Create HttpRequest to be signed
     const request_headers = new Headers();
-    // for (const key in req.headers) {
-    //     request_headers.set(key, req.headers[key]);
-    // }
+    for (const key in req.headers) {
+        request_headers.set(key, req.headers[key]);
+    }
     const httpRequest = {
         uri: `${userDetails.routerSignatureHost}${notebookUrlPath}`,
         headers: request_headers,
-        method: req.method
+        method: req.method,
+        body,
     };
 
     // 3. sign request
@@ -73,6 +74,7 @@ async function signRequestWithOciIdentity(req, userDetails) {
     // 5. Modify the current request object with new headers
     req.url = notebookUrlPath; //modifing req url
     req.headers = serialized_req_headers;
+    req.body = body;
     console.log(`request has been signed successfully`);
   } catch (error) {
     console.log(`Error during signing request: ${error}`)
