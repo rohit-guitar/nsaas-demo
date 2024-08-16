@@ -62,7 +62,7 @@ function getBody(request) {
 }
 
 proxy.on('proxyReq', function(proxyReq, req, res, options) {
-  if (req.body && req.method !== "GET") {
+  if (req.body && req.body.length > 0) {
     console.log("Restreaming body");
     proxyReq.write(req.body);
   }
