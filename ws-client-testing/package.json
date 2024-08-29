@@ -1,0 +1,12 @@
+{
+  "name": "ws-client-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "resolutions": {
+    "es5-ext": "0.10.53"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "websocket": "^1.0.35"
+  }
+}
